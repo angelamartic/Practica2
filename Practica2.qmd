@@ -5,32 +5,32 @@ format: html
 editor: visual
 ---
 
-## Entrega 2
-
-```{r, echo=FALSE, message=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 library(tidyverse)
 library(ggplot2)
-
 ```
 
-hacer un mutate, crear una vaiable q es digui score, sumar percolumnes i q crei la base de datos (contain)
+# Objectius del projecte
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+L'objectiu principal d'aquesta enquesta és analitzar si la formació en veu que té l'enquestat influeix en la percepció de qualitat de la mateixa. En concret al nostre grup ens ha tocat treballar sobre la relació entre la veu i l'edat; intentarem respondre a la pregunta: ¿Hi ha qualque edat amb més incidències de símptomes vocals? D'aquesta manera intentarem arribar a una conclusió que ens permeti valorar si la veu es deteriora amb l'edat, o pel contrari no existeix una relació important entre ambdoós factors.
 
-## Running Code
+Emprarem en primer lloc les dades de la variable *edat* que ens ve donada en forma de dades ordinals. Farem un gràfic per visualitzar com es distribueixen els enquestats a les diferents categories. (Entre 20 i 35, Entre 36 i 50, Entre 51 i 65, + de 65).
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+També utilitzarem els resultats del test que s'ha inclòs al final de l'enquesta que ens venen donats com dades quantitatives discretes que es sitúen entre 0 i 40; on més puntuació implica que l'enquestat té una pitjor salut de la veu. Per obtenir aquestes dades substituirem les possibles respostes de cada pregunta per dades numèriques entre 1 i 4. Finalment sumarem tots els valors agrupant les dades a una columna que ens doni la puntuació final.
+
+Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relació que cercam o no.
 
 ```{r}
-1 + 1
+dades <- "Salut_Vocal_anonimizada.csv" %>% read.csv(,sep = ";")
+head(dades)
+
 ```
 
-You can add options to executable code like this
+
 
 ```{r}
-#| echo: false
-2 * 2
+grafic <- dades %>% ggplot(aes(x = Quina.edat.té.)) + geom_bar()
+grafic
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
