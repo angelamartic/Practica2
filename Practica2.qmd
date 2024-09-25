@@ -11,7 +11,86 @@ library(tidyverse)
 library(ggplot2)
 ```
 
+#Descripcio dades
+
+```{r, warning=FALSE} 
+
+#Aquí primer renombram les columnes perquè sigui més fàcil d'entendre
+dades <- read.csv("Salut_Vocal_anonimizada.csv", sep = ";") 
+dades <- dades %>% rename(
+  p1 = La.gent.em.sent.amb.dificultat.a.causa.de.la.meva.veu,
+  p2 = La.gent.no.m.entén.en.llocs.sorollosos,
+  p3 = Els.meus.problemes.amb.la.veu.alteren.la.meva.vida.personal.i.social,
+  p4 = Em.sent.desplaçat.de.les.converses.per.la.meva.veu,
+  p5 = El.meu.problema.amb.la.veu.afecta.el.rendiment.laboral,
+  p6 = Not.que.necessit.tensar.la.gola..gargamella..per.produir.la.veu,
+  p7 = La.qualitat.de.la.meva.veu.és.imprevisible,
+  p8 = La.meva.veu.em.molesta,
+  p9 = La.meva.veu.em.fa.sentir.certa.minusvalidesa,
+  p10 = La.gent.em.pregunta..què.et.passa.amb.la.veu.
+  )
+
+
+#Ara el que feim es canviar els caràcters pels factors corresponents. Ho renombrarem a la mateixa columna "perdent" la informació en el data frame ja que no ens interessa tenir-la.
+dades <- dades %>% mutate(
+    p1 = factor(p1, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p2 = factor(p2, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p3 = factor(p3, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p4 = factor(p4, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p5 = factor(p5, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    
+    p6 = factor(p6, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p7 = factor(p7, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p8 = factor(p8, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p9 = factor(p9, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p10 = factor(p10, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    
+    .keep = "all", .after = Fa.alguna.de.les.activitats.següents..Es.pot.marcar.més.d.una.opció
+  )
+
+#Ara ho hauria de passar a numeric
+
+dades <- dades %>%
+  mutate(across(29:38, as.numeric))
+
+#Ara afegim una fila amb el sumatori
+dades <- dades %>%
+  mutate(total = rowSums(temp_data, na.rm = TRUE))
+```
+
+
 # Objectius del projecte
+
 
 L'objectiu principal d'aquesta enquesta és analitzar si la formació en veu que té l'enquestat influeix en la percepció de qualitat de la mateixa. En concret al nostre grup ens ha tocat treballar sobre la relació entre la veu i l'edat; intentarem respondre a la pregunta: ¿Hi ha qualque edat amb més incidències de símptomes vocals? D'aquesta manera intentarem arribar a una conclusió que ens permeti valorar si la veu es deteriora amb l'edat, o pel contrari no existeix una relació important entre ambdoós factors.
 
@@ -20,6 +99,8 @@ Emprarem en primer lloc les dades de la variable *edat* que ens ve donada en for
 També utilitzarem els resultats del test que s'ha inclòs al final de l'enquesta que ens venen donats com dades quantitatives discretes que es sitúen entre 0 i 40; on més puntuació implica que l'enquestat té una pitjor salut de la veu. Per obtenir aquestes dades substituirem les possibles respostes de cada pregunta per dades numèriques entre 1 i 4. Finalment sumarem tots els valors agrupant les dades a una columna que ens doni la puntuació final.
 
 Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relació que cercam o no.
+
+Primer extraguem les dades i feim un gráfic:
 
 ```{r, warning=FALSE}
 dades <-read.csv("Salut_Vocal_anonimizada.csv", sep = ";")
