@@ -1,0 +1,6 @@
+---
+title: "Entrega1_AD"
+author: "Jaume Maimó, Àngela Martí i Sergio Rivadulla"
+format: html
+editor: visual
+---
