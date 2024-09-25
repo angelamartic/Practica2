@@ -21,12 +21,28 @@ També utilitzarem els resultats del test que s'ha inclòs al final de l'enquest
 
 Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relació que cercam o no.
 
-```{r}
-dades <- "Salut_Vocal_anonimizada.csv" %>% read.csv(,sep = ";")
-head(dades)
-
+```{r, warning=FALSE}
+dades <-read.csv("Salut_Vocal_anonimizada.csv", sep = ";")
+edat <- dades %>% select(Quina.edat.té.)
+sintomes.aquest.mes <- dades %>% select(Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció)
+baixa.veu <- dades %>% select(En.alguna.ocasió..ha.estat.de.baixa.laboral.per.problemes.de.veu.)
+problemes.veu.22.23 <- dades %>% select(Ha.tengut.problemes.de.veu.importants.i.que.li.han.dificultat.la.feina.al.llarg.del.curs.2022.2023.)
 ```
 
+
+```{r}
+# Contar las ocurrencias de cada categoría
+conteig <- table(edat)  
+conteig
+
+barplot(conteig, 
+        main = "Conteig d'edats",         
+        xlab = "Edats",       
+        ylab = "Nombre d'ocurrencies",    
+        col = "blue",                      
+        border = "black")                  
+
+```
 
 
 ```{r}
