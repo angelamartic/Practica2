@@ -1,10 +1,18 @@
 ---
 title: "Entrega 2"
+author: "Àngela Martí, Sergio Rivadulla i Jaume Maimó"
 format: html
 editor: visual
 ---
 
-## Quarto
+## Entrega 2
+
+```{r, echo=FALSE, message=FALSE}
+
+library(tidyverse)
+library(ggplot2)
+
+```
 
 hacer un mutate, crear una vaiable q es digui score, sumar percolumnes i q crei la base de datos (contain)
 
