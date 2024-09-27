@@ -11,7 +11,91 @@ library(tidyverse)
 library(ggplot2)
 ```
 
+#Descripció de les dades
+
+```{r, warning=FALSE} 
+
+#Aquí primer renombram les columnes perquè sigui més fàcil d'entendre
+dades <- read.csv("Salut_Vocal_anonimizada.csv", sep = ";") 
+dades <- dades %>% rename(
+  p1 = La.gent.em.sent.amb.dificultat.a.causa.de.la.meva.veu,
+  p2 = La.gent.no.m.entén.en.llocs.sorollosos,
+  p3 = Els.meus.problemes.amb.la.veu.alteren.la.meva.vida.personal.i.social,
+  p4 = Em.sent.desplaçat.de.les.converses.per.la.meva.veu,
+  p5 = El.meu.problema.amb.la.veu.afecta.el.rendiment.laboral,
+  p6 = Not.que.necessit.tensar.la.gola..gargamella..per.produir.la.veu,
+  p7 = La.qualitat.de.la.meva.veu.és.imprevisible,
+  p8 = La.meva.veu.em.molesta,
+  p9 = La.meva.veu.em.fa.sentir.certa.minusvalidesa,
+  p10 = La.gent.em.pregunta..què.et.passa.amb.la.veu.
+  )
+
+
+#Ara el que feim és canviar els caràcters pels factors corresponents. Farem els a la mateixa columna del data frame.
+dades <- dades %>% mutate(
+    p1 = factor(p1, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p2 = factor(p2, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p3 = factor(p3, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p4 = factor(p4, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p5 = factor(p5, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    
+    p6 = factor(p6, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p7 = factor(p7, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p8 = factor(p8, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p9 = factor(p9, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    p10 = factor(p10, 
+    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
+    labels = c(0,1,2,3,4)),
+    
+    .keep = "all", .after = Fa.alguna.de.les.activitats.següents..Es.pot.marcar.més.d.una.opció
+  )
+
+#Ara hem de passar les dades a numèric.
+
+dades <- dades %>%
+  mutate(across(29:38, as.numeric))
+
+#Ara afegim una columna amb el sumatori
+
+dades2 <- dades %>%
+  select(-last_col())
+
+dades2 <- dades2 %>%
+  rowwise() %>%  # Para aplicar la operación fila por fila
+  mutate(SumaFila = sum(c_across(29:37), na.rm = TRUE)) %>%
+  ungroup()
+```
+
+
 # Objectius del projecte
+
 
 L'objectiu principal d'aquesta enquesta és analitzar si la formació en veu que té l'enquestat influeix en la percepció de qualitat de la mateixa. En concret al nostre grup ens ha tocat treballar sobre la relació entre la veu i l'edat; intentarem respondre a la pregunta: ¿Hi ha qualque edat amb més incidències de símptomes vocals? D'aquesta manera intentarem arribar a una conclusió que ens permeti valorar si la veu es deteriora amb l'edat, o pel contrari no existeix una relació important entre ambdoós factors.
 
@@ -22,16 +106,28 @@ També utilitzarem els resultats del test que s'ha inclòs al final de l'enquest
 Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relació que cercam o no.
 
 ```{r}
-dades <- "Salut_Vocal_anonimizada.csv" %>% read.csv(,sep = ";")
-head(dades)
 dades$Quina.edat.té. <- dades$Quina.edat.té. %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
+conteig <- dades2$Quina.edat.té. %>% table()  
 
+barplot(conteig, 
+        main = "Distribució per edats",         
+        xlab = "Edats",       
+        ylab = "Freqüència absoluta",    
+        col = "blue",                      
+        border = "black")
 ```
-
-
 
 ```{r}
-grafic <- dades %>% ggplot(aes(x = Quina.edat.té.)) + geom_bar()
+dades2$Quina.edat.té. <- dades$Quina.edat.té. %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
+grafic <- dades %>% ggplot(aes(x = Quina.edat.té.)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
 grafic
 ```
+
+```{r}
+grafic2 <- dades2 %>% select(Quina.edat.té., SumaFila) %>% ggplot(aes(x = Quina.edat.té., y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+grafic2
+```
+
+
+
 
