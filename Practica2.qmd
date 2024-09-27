@@ -24,6 +24,7 @@ Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relaci
 ```{r}
 dades <- "Salut_Vocal_anonimizada.csv" %>% read.csv(,sep = ";")
 head(dades)
+dades$Quina.edat.té. <- dades$Quina.edat.té. %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
 
 ```
 
