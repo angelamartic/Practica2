@@ -125,5 +125,3 @@ grafic
 grafic2 <- dades2 %>% select(Quina.edat.té., SumaFila) %>% ggplot(aes(x = Quina.edat.té., y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic2
 ```
-
-hola esto es un prova
