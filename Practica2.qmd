@@ -11,9 +11,9 @@ library(tidyverse)
 library(ggplot2)
 ```
 
-#Descripció de les dades
+# Descripció de les dades
 
-```{r, warning=FALSE} 
+```{r, warning=FALSE}
 
 #Aquí primer renombram les columnes perquè sigui més fàcil d'entendre
 dades <- read.csv("Salut_Vocal_anonimizada.csv", sep = ";") 
@@ -93,9 +93,7 @@ dades2 <- dades2 %>%
   ungroup()
 ```
 
-
 # Objectius del projecte
-
 
 L'objectiu principal d'aquesta enquesta és analitzar si la formació en veu que té l'enquestat influeix en la percepció de qualitat de la mateixa. En concret al nostre grup ens ha tocat treballar sobre la relació entre la veu i l'edat; intentarem respondre a la pregunta: ¿Hi ha qualque edat amb més incidències de símptomes vocals? D'aquesta manera intentarem arribar a una conclusió que ens permeti valorar si la veu es deteriora amb l'edat, o pel contrari no existeix una relació important entre ambdoós factors.
 
@@ -127,7 +125,3 @@ grafic
 grafic2 <- dades2 %>% select(Quina.edat.té., SumaFila) %>% ggplot(aes(x = Quina.edat.té., y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic2
 ```
-
-
-
-
