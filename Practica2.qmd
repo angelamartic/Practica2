@@ -8,6 +8,7 @@ editor: visual
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 library(tidyverse)
+library(scales)
 library(ggplot2)
 ```
 
@@ -115,11 +116,13 @@ barplot(conteig,
         border = "black")
 ```
 
-```{r}
-dades2$Quina.edat.té. <- dades$Quina.edat.té. %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
-grafic <- dades %>% ggplot(aes(x = Quina.edat.té.)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
-grafic
-```
+
+
+
+
+
+
+
 
 ```{r}
 grafic2 <- dades2 %>% select(Quina.edat.té., SumaFila) %>% ggplot(aes(x = Quina.edat.té., y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
