@@ -8,7 +8,6 @@ editor: visual
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 library(tidyverse)
-library(scales)
 library(ggplot2)
 ```
 
@@ -104,35 +103,38 @@ També utilitzarem els resultats del test que s'ha inclòs al final de l'enquest
 
 Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relació que cercam o no.
 
-```{r}
-dades$Quina.edat.té. <- dades$Quina.edat.té. %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
-conteig <- dades2$Quina.edat.té. %>% table()  
+# Anàlisis de les dades
 
-barplot(conteig, 
-        main = "Distribució per edats",         
-        xlab = "Edats",       
-        ylab = "Freqüència absoluta",    
-        col = "blue",                      
-        border = "black")
+
+
+```{r}
+dades2$Quina.edat.té. <- dades$Quina.edat.té. %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
+grafic <- dades %>% ggplot(aes(x = Quina.edat.té.)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
+grafic
 ```
+En primer lloc, llegim les dades que tenim i canviem els noms per que ens sigui més facil l'anàlisi.
 
 ```{r, warning=FALSE}
-dades <-read.csv("Salut_Vocal_anonimizada.csv", sep = ";")
-edat <- dades %>% select(Quina.edat.té.)
-sintomes.aquest.mes <- dades %>% select(Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció)
-baixa.veu <- dades %>% select(En.alguna.ocasió..ha.estat.de.baixa.laboral.per.problemes.de.veu.)
-problemes.veu.22.23 <- dades %>% select(Ha.tengut.problemes.de.veu.importants.i.que.li.han.dificultat.la.feina.al.llarg.del.curs.2022.2023.)
+dades <- dades %>% rename(
+  edat = Quina.edat.té.,
+  sintomes.aquest.mes = Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció,
+  baixa.veu = En.alguna.ocasió..ha.estat.de.baixa.laboral.per.problemes.de.veu.,
+  problemes.veu.22.23 = Ha.tengut.problemes.de.veu.importants.i.que.li.han.dificultat.la.feina.al.llarg.del.curs.2022.2023.
+ )
+
 ```
+
+
 
 Anem a separar les variables de la variable sintomes.aquest més:
 
 ```{r}
-dades$Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció <- as.character(dades$Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció)
+dades$sintomes.aquest.mes <- as.character(dades$sintomes.aquest.mes)
 
-sintomes.mes <- dades %>%
-  separate_rows(Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció, sep = ",\\s*")
+sintomes.mes.separat <- dades %>%
+  separate_rows(sintomes.aquest.mes, sep = ",\\s*")
 
-contar_sintomes_mes <- sintomes.mes %>% group_by(Quina.edat.té., Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció) %>%
+contar_sintomes_mes <- sintomes.mes.separat %>% group_by(edat, sintomes.aquest.mes) %>%
   summarise(Conteo = n()) %>%
   ungroup()
 
@@ -141,41 +143,17 @@ contar_sintomes_mes
 
 ```{r}
 library(ggplot2)
-ggplot(contar_sintomes_mes, aes(x = Quina.edat.té., y = Conteo)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Conteo de Síntomas por Edad", x = "Edad", y = "Conteo de Síntomas")
-```
+dades$edat <- factor(dades$edat, 
+                     levels = c("Entre 20-35", "Entre 36-50", "Entre 51-65", "+ de 65"))
 
-```{r}
-# Convertir a numérico (puede generar NA si hay valores no convertibles)
-dades$sintomes.aquest.mes <- as.numeric(as.character(sintomes.aquest.mes))
 
-# Verificar si hay NA después de la conversión
-sum(is.na(sintomes.aquest.mes))  # Ver cuántos NA hay
 
-# Ver los valores únicos de la columna de síntomas
-unique(sintomes.aquest.mes)
-
-incidencia_por_edad <- dades %>%
-  group_by(Quina.edat.té.) %>%  # Asegúrate de usar el nombre correcto de la columna de edad
-  summarise(SumaSintomas = sum(sintomes.aquest.mes, na.rm = FALSE),  # Asegúrate de que sea numérico
-            Conteo = n()) %>%
-  mutate(IncidenciaPorcentaje = (SumaSintomas / Conteo) * 100)
+ggplot(contar_sintomes_mes, aes(x = edat, y = Conteo, fill = sintomes.aquest.mes)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Contador de Simptomes por Edat", x = "Edat", y = "Contador de Simptomes") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 ```
 
-```{r}
-
-ggplot(incidencia_por_edad, aes(x = edat, y = IncidenciaPorcentaje)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  labs(title = "Incidencia de Síntomas Vocales por Edad",
-       x = "Edad",
-       y = "Porcentaje de Incidencia") +
-  theme_minimal()
-```
-
-```{r}
-grafic2 <- dades2 %>% select(Quina.edat.té., SumaFila) %>% ggplot(aes(x = Quina.edat.té., y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
-grafic2
-```
