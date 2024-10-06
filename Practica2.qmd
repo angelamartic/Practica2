@@ -143,11 +143,6 @@ contar_sintomes_mes
 
 ```{r}
 library(ggplot2)
-dades$edat <- factor(dades$edat, 
-                     levels = c("Entre 20-35", "Entre 36-50", "Entre 51-65", "+ de 65"))
-
-
-
 ggplot(contar_sintomes_mes, aes(x = edat, y = Conteo, fill = sintomes.aquest.mes)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Contador de Simptomes por Edat", x = "Edat", y = "Contador de Simptomes") +
@@ -155,5 +150,73 @@ ggplot(contar_sintomes_mes, aes(x = edat, y = Conteo, fill = sintomes.aquest.mes
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
+```
+Ara, anem a comparar les edats amb si s'han agafat en alguna ocasió la baixa laboral per problemes de veu:
+
+```{r}
+# Cargar los paquetes necesarios
+library(dplyr)
+
+# Supongamos que tu dataframe se llama 'encuesta'
+# Reemplazamos la respuesta incorrecta en la fila 16 con una sola opción
+dades <- dades %>%
+  mutate(baixa.veu = ifelse(baixa.veu == "No, mai he estat de baixa per un problema de veu, Si, he tengut alguna o algunes baixes per problemes de veu", 
+                       "Si, he tengut alguna o algunes baixes per problemes de veu", 
+                       baixa.veu))
+table(dades$baixa.veu)
+
+# Crear tabla cruzada entre edad y baja
+taula_creuada_baixa <- as.data.frame(table(dades$edat, dades$baixa.veu))
+taula_creuada_baixa
+```
+Fem un grafic:
+
+```{r}
+# Cambiar los nombres de las columnas para mayor claridad
+colnames(taula_creuada_baixa) <- c("edat", "baixa.veu", "Freq")
+
+# Crear el gráfico
+ggplot(taula_creuada_baixa, aes(x = edat, y = Freq, fill = baixa.veu)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Frecuenqüéncia de baixes per edat", 
+       x = "Rang d'Edad", 
+       y = "Freqüéncia", 
+       fill = "Baixes per veu") +
+  theme_minimal()
+
+
+```
+
+
+Per ùltim, anem a veure la relació entre l'edat i els problemes de veu en el any 2022_2023:
+```{r}
+table(dades$edat)
+table(dades$problemes.veu.22.23)
+# Taula creuada entre edats i problemes de veu entre el 22.23:
+taula_creuada_problemes_veu <- as.data.frame(table(dades$edat, dades$problemes.veu.22.23))
+taula_creuada_problemes_veu
+
+```
+
+Fem un grafic:
+
+```{r}
+# Cambiar los nombres de las columnas para mayor claridad
+colnames(taula_creuada_problemes_veu) <- c("edat", "Problemes_veu_2223", "Freq")
+
+# Crear el gráfico
+ggplot(taula_creuada_problemes_veu, aes(x = edat, y = Freq, fill = Problemes_veu_2223)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Frecuenqüéncia de baixes per edat", 
+       x = "Rang d'Edad", 
+       y = "Freqüéncia", 
+       fill = "Problemes veu 22.23") +
+  theme_minimal()
+
+```
+
+```{r}
+grafic2 <- dades2 %>% select(Quina.edat.té., SumaFila) %>% ggplot(aes(x = Quina.edat.té., y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+grafic2
 ```
 
