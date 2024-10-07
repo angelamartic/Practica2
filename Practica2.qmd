@@ -11,7 +11,7 @@ library(tidyverse)
 library(ggplot2)
 ```
 
-# Descripció de les dades
+#Descripció de les dades
 
 ```{r, warning=FALSE}
 
@@ -91,6 +91,16 @@ dades2 <- dades2 %>%
   rowwise() %>%  # Para aplicar la operación fila por fila
   mutate(SumaFila = sum(c_across(29:37), na.rm = TRUE)) %>%
   ungroup()
+dades2 <- dades2 %>% rename(simptomes = Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció)
+simptomes_sep <- strsplit(dades2$simptomes, ",")
+simptomes_sep <- simptomes_sep %>% unlist()
+simptomes_sep <- gsub("\\s","", simptomes_sep)
+simptomes_sep <- gsub("escanyada","",simptomes_sep)
+simptomes_sep <- simptomes_sep[simptomes_sep != ""]
+simptomes_sep
+```
+```{r}
+barplot(table(simptomes_sep))
 ```
 
 # Objectius del projecte
@@ -125,5 +135,3 @@ grafic
 grafic2 <- dades2 %>% select(Quina.edat.té., SumaFila) %>% ggplot(aes(x = Quina.edat.té., y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic2
 ```
-
-hola esto es un prova
