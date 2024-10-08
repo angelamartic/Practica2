@@ -9,15 +9,22 @@ editor: visual
 
 library(tidyverse)
 library(ggplot2)
+library(dplyr)
 ```
 
 #Descripció de les dades
 
 ```{r, warning=FALSE}
+raw_data <- read.csv("Salut_Vocal_anonimizada.csv", sep = ";")
 
-#Aquí primer renombram les columnes perquè sigui més fàcil d'entendre
-dades <- read.csv("Salut_Vocal_anonimizada.csv", sep = ";") 
-dades <- dades %>% rename(
+#La darrera columna no conté cap tipus d'informació
+raw_data <- raw_data %>% select(-last_col())
+
+#Renombram les variables que emprarem
+
+dades <- raw_data %>% rename(
+  edat = Quina.edat.té.,
+  simptomes = Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció,
   p1 = La.gent.em.sent.amb.dificultat.a.causa.de.la.meva.veu,
   p2 = La.gent.no.m.entén.en.llocs.sorollosos,
   p3 = Els.meus.problemes.amb.la.veu.alteren.la.meva.vida.personal.i.social,
@@ -30,8 +37,8 @@ dades <- dades %>% rename(
   p10 = La.gent.em.pregunta..què.et.passa.amb.la.veu.
   )
 
-
 #Ara el que feim és canviar els caràcters pels factors corresponents. Farem els a la mateixa columna del data frame.
+
 dades <- dades %>% mutate(
     p1 = factor(p1, 
     levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
@@ -79,25 +86,17 @@ dades <- dades %>% mutate(
 
 #Ara hem de passar les dades a numèric.
 
-dades <- dades %>%
-  mutate(across(29:38, as.numeric))
+dades <- dades %>% mutate(across(29:37, as.numeric))
 
 #Ara afegim una columna amb el sumatori
 
-dades2 <- dades %>%
-  select(-last_col())
-
-dades2 <- dades2 %>%
-  rowwise() %>%  # Para aplicar la operación fila por fila
+dades <- dades %>%
+  rowwise() %>%  
   mutate(SumaFila = sum(c_across(29:37), na.rm = TRUE)) %>%
   ungroup()
-dades2 <- dades2 %>% rename(simptomes = Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció)
-simptomes_sep <- strsplit(dades2$simptomes, ",")
-simptomes_sep <- simptomes_sep %>% unlist()
-simptomes_sep <- gsub("\\s","", simptomes_sep)
-simptomes_sep <- gsub("escanyada","",simptomes_sep)
-simptomes_sep <- simptomes_sep[simptomes_sep != ""]
-simptomes_sep
+
+dades$edat <- dades$edat %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
+
 ```
 ```{r}
 barplot(table(simptomes_sep))
@@ -113,25 +112,73 @@ També utilitzarem els resultats del test que s'ha inclòs al final de l'enquest
 
 Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relació que cercam o no.
 
-```{r}
-dades$Quina.edat.té. <- dades$Quina.edat.té. %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
-conteig <- dades2$Quina.edat.té. %>% table()  
-
-barplot(conteig, 
-        main = "Distribució per edats",         
-        xlab = "Edats",       
-        ylab = "Freqüència absoluta",    
-        col = "blue",                      
-        border = "black")
-```
+# Anàlisis de les dades
 
 ```{r}
-dades2$Quina.edat.té. <- dades$Quina.edat.té. %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
-grafic <- dades %>% ggplot(aes(x = Quina.edat.té.)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
+grafic <- dades %>% ggplot(aes(x = edat)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
 grafic
 ```
 
+Anem a separar les variables de la variable sintomes.aquest més:
+
 ```{r}
-grafic2 <- dades2 %>% select(Quina.edat.té., SumaFila) %>% ggplot(aes(x = Quina.edat.té., y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+dades$simptomes <- dades$simptomes %>% as.character()
+
+simptomes_separat <- dades %>% separate_rows(simptomes, sep = ",\\s*")
+
+contar_simptomes <- simptomes_separat %>% group_by(edat, simptomes) %>%
+  summarise(Conteo = n()) %>%
+  ungroup()
+```
+
+```{r}
+
+contar_simptomes %>% ggplot(aes(x = edat, y = Conteo, fill = simptomes)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Aparició de símptomes per edat", x = "Edat", y = "Freqüència absoluta") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+grafic2 <- dades %>% select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic2
 ```
+
+```{r}
+grafic3 <- dades %>%  select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_violin(trim = F, fill = "pink", color = "red") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+grafic3
+```
+
+A partir d'aquí crec que no fa falta
+
+Finalment, anem a veure la relació entre l'edat i els problemes de veu en el any 2022_2023:
+
+```{r}
+table(dades$edat)
+table(dades$problemes.veu.22.23)
+# Taula creuada entre edats i problemes de veu entre el 22.23:
+taula_creuada_problemes_veu <- as.data.frame(table(dades$edat, dades$problemes.veu.22.23))
+taula_creuada_problemes_veu
+
+```
+
+Fem un grafic:
+
+```{r}
+# Cambiar los nombres de las columnas para mayor claridad
+colnames(taula_creuada_problemes_veu) <- c("edat", "Problemes_veu_2223", "Freq")
+
+# Crear el gráfico
+ggplot(taula_creuada_problemes_veu, aes(x = edat, y = Freq, fill = Problemes_veu_2223)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Frecuenqüéncia de baixes per edat", 
+       x = "Rang d'Edad", 
+       y = "Freqüéncia", 
+       fill = "Problemes veu 22.23") +
+  theme_minimal()
+
+```
+
+
+
