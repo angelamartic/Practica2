@@ -98,6 +98,7 @@ dades <- dades %>%
 dades$edat <- dades$edat %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
 
 ```
+
 ```{r}
 barplot(table(simptomes_sep))
 ```
@@ -149,36 +150,4 @@ grafic2
 grafic3 <- dades %>%  select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_violin(trim = F, fill = "pink", color = "red") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic3
 ```
-
-A partir d'aquí crec que no fa falta
-
-Finalment, anem a veure la relació entre l'edat i els problemes de veu en el any 2022_2023:
-
-```{r}
-table(dades$edat)
-table(dades$problemes.veu.22.23)
-# Taula creuada entre edats i problemes de veu entre el 22.23:
-taula_creuada_problemes_veu <- as.data.frame(table(dades$edat, dades$problemes.veu.22.23))
-taula_creuada_problemes_veu
-
-```
-
-Fem un grafic:
-
-```{r}
-# Cambiar los nombres de las columnas para mayor claridad
-colnames(taula_creuada_problemes_veu) <- c("edat", "Problemes_veu_2223", "Freq")
-
-# Crear el gráfico
-ggplot(taula_creuada_problemes_veu, aes(x = edat, y = Freq, fill = Problemes_veu_2223)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Frecuenqüéncia de baixes per edat", 
-       x = "Rang d'Edad", 
-       y = "Freqüéncia", 
-       fill = "Problemes veu 22.23") +
-  theme_minimal()
-
-```
-
-
 
