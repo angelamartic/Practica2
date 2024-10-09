@@ -146,4 +146,4 @@ grafic2
 grafic3 <- dades %>%  select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_violin(trim = F, fill = "pink", color = "red") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic3
 ```
-
+hola
