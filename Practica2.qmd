@@ -76,7 +76,7 @@ raw_data <- raw_data %>% rename(
     Gent_pregunta="La.gent.em.pregunta..què.et.passa.amb.la.veu."
 )
 
-glimpse(raw_data)
+#glimpse(raw_data)
 ```
 
 Anam a netejar les variables i a convertir les categòriques en factors, a excepció de "Importancia_veu" i "dieta_saludable", que les deixarem com a qualitatives discretes. A més, farem un parell de neteja de les dades per a no tindre problemes en el futur.
@@ -125,7 +125,7 @@ Finalment, eliminarem les variables de la 28 a la 37 i afegim la variable VHI.
 ```{r}
 dades<-dades %>% select(-c(28:37))%>% 
    bind_cols(VHI=dades_1$VHI)
-glimpse(dades) 
+#glimpse(dades) 
 
 ```
 
@@ -145,7 +145,7 @@ Com em indicat, en primer lloc, farem un gràfic, per veure com es distribueixen
 
 ```{r}
 grafic1 <- dades %>% ggplot(aes(x = edat)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
-grafic
+grafic1
 ```
 Per tant, tenim més enquestats de entre 36 i 50 anys , i molt pocs, casi nuls, de +65 anys, per la qual cosa, això ens podrà dur problemes a l'hora de traure una conclusió. 
 
@@ -221,117 +221,6 @@ Un *p-valor* tan gran no ens permet rebutjar la hipòtesi nul·la de que les var
 
 
 
-Anem a separar les variables de la variable sintomes.aquest més:
-
-```{r}
-dades$simptomes <- dades$simptomes %>% as.character()
-
-simptomes_separat <- dades %>% separate_rows(simptomes, sep = ",\\s*")
-
-contar_simptomes <- simptomes_separat %>% group_by(edat, simptomes) %>%
-  summarise(Conteo = n()) %>%
-  ungroup()
-```
-
-```{r}
-
-contar_simptomes %>% ggplot(aes(x = edat, y = Conteo, fill = simptomes)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Aparició de símptomes per edat", x = "Edat", y = "Freqüència absoluta") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-```{r}
-grafic2 <- dades %>% select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
-grafic2
-```
-
-```{r}
-grafic3 <- dades %>%  select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_violin(trim = F, fill = "pink", color = "red") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
-grafic3
-```
 
 
 
-
-"JAUME - HO DEIXE PERSIDECAS 
-```{r}
-
-dades <- raw_data %>% rename(
-  edat = Quina.edat.té.,
-  simptomes = Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció,
-  p1 = La.gent.em.sent.amb.dificultat.a.causa.de.la.meva.veu,
-  p2 = La.gent.no.m.entén.en.llocs.sorollosos,
-  p3 = Els.meus.problemes.amb.la.veu.alteren.la.meva.vida.personal.i.social,
-  p4 = Em.sent.desplaçat.de.les.converses.per.la.meva.veu,
-  p5 = El.meu.problema.amb.la.veu.afecta.el.rendiment.laboral,
-  p6 = Not.que.necessit.tensar.la.gola..gargamella..per.produir.la.veu,
-  p7 = La.qualitat.de.la.meva.veu.és.imprevisible,
-  p8 = La.meva.veu.em.molesta,
-  p9 = La.meva.veu.em.fa.sentir.certa.minusvalidesa,
-  p10 = La.gent.em.pregunta..què.et.passa.amb.la.veu.
-  )
-
-#Ara el que feim és canviar els caràcters pels factors corresponents. Farem els a la mateixa columna del data frame.
-
-dades <- dades %>% mutate(
-    p1 = factor(p1, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    p2 = factor(p2, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    p3 = factor(p3, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    p4 = factor(p4, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    p5 = factor(p5, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    
-    p6 = factor(p6, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    p7 = factor(p7, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    p8 = factor(p8, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    p9 = factor(p9, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    p10 = factor(p10, 
-    levels = c("Mai", "Gairebé mai", "A vegades", "Gairebé sempre", "Sempre"), 
-    labels = c(0,1,2,3,4)),
-    
-    .keep = "all", .after = Fa.alguna.de.les.activitats.següents..Es.pot.marcar.més.d.una.opció
-  )
-
-#Ara hem de passar les dades a numèric.
-
-dades <- dades %>% mutate(across(29:37, as.numeric))
-
-#Ara afegim una columna amb el sumatori
-
-dades <- dades %>%
-  rowwise() %>%  
-  mutate(SumaFila = sum(c_across(29:37), na.rm = TRUE)) %>%
-  ungroup()
-
-dades$edat <- dades$edat %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
-
-```
-"
