@@ -129,23 +129,6 @@ glimpse(dades)
 
 ```
 
-
-## P3: ¿Hay alguna edad con mayor incidencia de síntomas vocales?
-
-**Grupo: los_angeles (Sergio,Àngela, Jaume)**
-
-
-Para responder esta pregunta podeis dibujar un diagrama de barras agrupadas entre edad y síntomas. Edad es un factor con 4 niveles y tenéis razón en cuanto a que no hace falta diferenciar por tipo de síntomas vocales.
-
-[Ayuda](https://rpubs.com/hllinas/R_Barras_ggplot_grupo)
-
-El barplot de edad debe estar ordenado de menor a mayor a mayor edad. 
-
-Luego, deberías hacer un test inferencial para ver si hay diferencias significativas entre las edades y los síntomas.
-
-[Ayuda](https://aprender-uib.github.io/MatesII/contrastos-dindepend%C3%A8ncia-i-homogene%C3%AFtat.html#test-chi2-dindepend%C3%A8ncia)
-
-
 # Objectius del projecte
 
 L'objectiu principal d'aquesta enquesta és analitzar si la formació en veu que té l'enquestat influeix en la percepció de qualitat de la mateixa. En concret al nostre grup ens ha tocat treballar sobre la relació entre la veu i l'edat; intentarem respondre a la pregunta: ¿Hi ha qualque edat amb més incidències de símptomes vocals? D'aquesta manera intentarem arribar a una conclusió que ens permeti valorar si la veu es deteriora amb l'edat, o pel contrari no existeix una relació important entre ambdoós factors.
