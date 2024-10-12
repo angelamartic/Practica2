@@ -27,8 +27,6 @@ library(dplyr)
 
 Llegim les dades del fitxer "Salut_Vocal_anonimizada.csv" i cambiem els noms de les variables.
 
-#Descripció de les dades
-
 ```{r, warning=FALSE}
 raw_data <- read.csv("Salut_Vocal_anonimizada.csv", sep = ";")
 
