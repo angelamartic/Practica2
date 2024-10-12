@@ -1,16 +1,31 @@
 ---
-title: "Entrega 2"
-author: "Àngela Martí, Sergio Rivadulla i Jaume Maimó"
-format: html
-editor: visual
+title: "Símptomes vocals en profesors"
+format:
+  html:
+    theme: lumen
+    toc: true
+    toc-depth: 3
+Rendering:
+    embed-resources: true
 ---
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+**Sergio Rivadulla, Jaume Maimó i Àngela Martí**
 
+**https://github.com/angelamartic/Practica2.git**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(tidyverse)
+library(readr)
+library(janitor)
+library(viridis)
 library(ggplot2)
 library(dplyr)
 ```
+
+## Lectura i neteja de les dades
+
+Llegim les dades del fitxer "Salut_Vocal_anonimizada.csv" i cambiem els noms de les variables.
 
 #Descripció de les dades
 
@@ -21,6 +36,244 @@ raw_data <- read.csv("Salut_Vocal_anonimizada.csv", sep = ";")
 raw_data <- raw_data %>% select(-last_col())
 
 #Renombram les variables que emprarem
+
+raw_data <- raw_data %>% rename(
+    Importancia_veu = "De.l.1.al.10.quina.importancia.té.la.veu.per.a.vostè.",
+    Sexe = "Sexe",
+    Lloc_feina="On.fa.feina.",
+    Cos_docent="Cos.docent",
+    Edat="Quina.edat.té.",
+    Activitats_fisiques="Practica.esport.o.fa.alguna.activitat.física.",
+    Importancia_deport="De.l.1.al.10.quina.importancia.té.la.pràctica.de.l.esport.o.activitat.física.per.a.vostè.",
+    Calitat_son="Té.una.bona.qualitat.del.son.",
+    Cafe="Consumeix.cafè.",
+    Tabac="Consumeix.tabac.",
+    Alcohol="Consumeix.alcohol.",
+    Begudes_gas="Consumeix.begudes.amb.gas.",
+    Dieta_saludable="De..l.1.al.10.assenyali.si.segueix.una.dieta.equilibrada.i.saludable.",
+    Diagnostic="Ha.estat.diagnosticat.per.un.metge.o.metgessa.d.alguna.de.les.malalties.següents.",
+    Patologia="Si.ha.marcat.alguna.de.les.opcions.anterior..especifiqui.la.patologia.",
+    Diagnostic_especialista="Ha.estat.diagnosticat.per.un.especialista.mèdic..otorinolaringòleg..foniatra..d.alguna.lesió.a.les.cordes.vocals.",
+    Simptomes="Aquest.mes.ha.tengut.algún.símptoma.vocal.dels.següents..Es.pot.marcar.més.d.una.opció",
+    Operacio="L.han.operat.de.les.cordes.vocals.",
+    Temps_alteracio="Si.té.alguna.alteració.de.la.veu..recorda.quin.temps.fa.que.va.començar.",
+    Baixa_veu="En.alguna.ocasió..ha.estat.de.baixa.laboral.per.problemes.de.veu.",
+    Baixa_llarga="Si.la.resposta.a.la.pregunta.anterior.és.afirmativa..indiqui.la.periodicitat..cada.any..trimestre.....i.la.durada.de.la.baixa.més.llarga.i.la.malaltia",
+    Problema_curs22_23="Ha.tengut.problemes.de.veu.importants.i.que.li.han.dificultat.la.feina.al.llarg.del.curs.2022.2023.",
+    Formacio_veu="Té.formació.sobre.salut.vocal.",
+    Medicacio="Pren.alguna.o.algunes.de.les.medicacions.següents..Es.pot.marcar.més.d.una.opció",
+    Higiene_vocal="Segueix.una.rutina.d.higiene.vocal.",
+    Activitats="Fa.alguna.de.les.activitats.següents..Es.pot.marcar.més.d.una.opció",
+    No_m_escolten="La.gent.em.sent.amb.dificultat.a.causa.de.la.meva.veu",
+    No_m_escolten_sorolls="La.gent.no.m.entén.en.llocs.sorollosos",
+    Alteracio_vida_social="Els.meus.problemes.amb.la.veu.alteren.la.meva.vida.personal.i.social",
+    Desplaçat_conversacio="Em.sent.desplaçat.de.les.converses.per.la.meva.veu",
+    Rendimient_laboral="El.meu.problema.amb.la.veu.afecta.el.rendiment.laboral",
+    Tensar_veu="Not.que.necessit.tensar.la.gola..gargamella..per.produir.la.veu",
+    Calitat_imprevisible="La.qualitat.de.la.meva.veu.és.imprevisible",
+    Em_molesta="La.meva.veu.em.molesta",
+    Minusvalia="La.meva.veu.em.fa.sentir.certa.minusvalidesa",
+    Gent_pregunta="La.gent.em.pregunta..què.et.passa.amb.la.veu."
+)
+
+glimpse(raw_data)
+```
+
+Anam a netejar les variables i a convertir les categòriques en factors, a excepció de "Importancia_veu" i "dieta_saludable", que les deixarem com a qualitatives discretes. A més, farem un parell de neteja de les dades per a no tindre problemes en el futur.
+
+```{r}
+raw_data <- janitor::clean_names(raw_data) 
+
+
+        
+dades <- raw_data %>%
+         mutate(across(-c(importancia_veu, dieta_saludable),
+                     as.factor))
+
+dades$edat <- dades$edat %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
+
+dades$simptomes <- dades$simptomes %>% as.character()
+
+simptomes_separat <- dades %>% separate_rows(simptomes, sep = ",\\s*")
+
+contar_simptomes <- simptomes_separat %>% group_by(edat, simptomes) %>%
+  summarise(Conteo = n()) %>%
+  ungroup()
+contar_simptomes <- contar_simptomes %>% filter(simptomes != "escanyada")
+
+```  
+
+Ara, per a calcular l'índex de calitat de veu (VHI), anam a seleccionar les variables desde la 28 a la 37 per a convertir-les en cualitatives discretes i així sumarles obtenint el ídex de VHI.
+
+```{r}
+dades_1<-dades %>% select(28:37) %>% 
+  mutate(across(everything(), ~case_when(
+     . == "Mai" ~ 0,
+     . == "Gairebé mai" ~ 1,
+     . == "A vegades" ~ 2,
+     . == "Gairebé sempre" ~ 3,
+     . == "Sempre" ~ 4
+   ))
+   )
+
+dades_1<-dades_1 %>% mutate(VHI=rowSums(dades_1))
+#glimpse(dades) 
+```
+
+Finalment, eliminarem les variables de la 28 a la 37 i afegim la variable VHI.
+
+```{r}
+dades<-dades %>% select(-c(28:37))%>% 
+   bind_cols(VHI=dades_1$VHI)
+glimpse(dades) 
+
+```
+
+
+## P3: ¿Hay alguna edad con mayor incidencia de síntomas vocales?
+
+**Grupo: los_angeles (Sergio,Àngela, Jaume)**
+
+
+Para responder esta pregunta podeis dibujar un diagrama de barras agrupadas entre edad y síntomas. Edad es un factor con 4 niveles y tenéis razón en cuanto a que no hace falta diferenciar por tipo de síntomas vocales.
+
+[Ayuda](https://rpubs.com/hllinas/R_Barras_ggplot_grupo)
+
+El barplot de edad debe estar ordenado de menor a mayor a mayor edad. 
+
+Luego, deberías hacer un test inferencial para ver si hay diferencias significativas entre las edades y los síntomas.
+
+[Ayuda](https://aprender-uib.github.io/MatesII/contrastos-dindepend%C3%A8ncia-i-homogene%C3%AFtat.html#test-chi2-dindepend%C3%A8ncia)
+
+
+# Objectius del projecte
+
+L'objectiu principal d'aquesta enquesta és analitzar si la formació en veu que té l'enquestat influeix en la percepció de qualitat de la mateixa. En concret al nostre grup ens ha tocat treballar sobre la relació entre la veu i l'edat; intentarem respondre a la pregunta: ¿Hi ha qualque edat amb més incidències de símptomes vocals? D'aquesta manera intentarem arribar a una conclusió que ens permeti valorar si la veu es deteriora amb l'edat, o pel contrari no existeix una relació important entre ambdoós factors.
+
+Emprarem, en primer lloc, les dades de la variable *edat* que ens ve donada en forma de dades ordinals. Farem un gràfic per visualitzar com es distribueixen els enquestats a les diferents categories. (Entre 20 i 35, Entre 36 i 50, Entre 51 i 65, + de 65).
+
+També utilitzarem els resultats del test que s'ha inclòs al final de l'enquesta que ens venen donats com dades quantitatives discretes que es sitúen entre 0 i 40; on més puntuació implica que l'enquestat té una pitjor salut de la veu. Per obtenir aquestes dades substituirem les possibles respostes de cada pregunta per dades numèriques entre 1 i 4. Finalment sumarem tots els valors agrupant les dades a una columna que ens doni la puntuació final.
+
+Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relació que cercam o no.
+
+# Anàlisis de les dades
+
+Com em indicat, en primer lloc, farem un gràfic, per veure com es distribueixen els enquestats a les diferents categories.
+
+```{r}
+grafic1 <- dades %>% ggplot(aes(x = edat)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
+grafic
+```
+Per tant, tenim més enquestats de entre 36 i 50 anys , i molt pocs, casi nuls, de +65 anys, per la qual cosa, això ens podrà dur problemes a l'hora de traure una conclusió. 
+
+Ara, farem un gràfic per veurer quin és el sintoma més freqüentat entre els enquestats, on facilment vegem que són la mucossitat i la necessitat d'aclarir la veu de manera persistent.
+
+```{r}
+grafic2 <- contar_simptomes %>% ggplot(aes(x=simptomes)) + geom_bar(color = "blue", fill = "blue") + labs(x="Simptomes", y="Freqüència absoluta") + ggtitle("Distribució per simptomes") + theme_minimal()
+grafic2
+```
+
+Ara, per respondrer aquesta pregunta, representarem un diagrama de barres agrupat entre l'edat i els simptomes:
+
+```{r}
+grafic3 <- contar_simptomes %>% ggplot(aes(x = edat, y = Conteo, fill = simptomes)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Aparició de símptomes per edat", x = "Edat", y = "Freqüència absoluta") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+grafic3
+```
+Vegem que a totes les edats predomina la mucositat, després tant la veu ronca com la necessitat d'aclarir la veu de manera persistent etan més o manco amb la mateixa freqüencia, i per ùltim la fatiga vocal, amb les dades que tenim, on més comú és entre 36 i 50 anys, emb +65 anys és nul·la, repetim, amb les dades que tenim.
+
+Per poder treure una conclusió més clara a la pregunta que ens demanen, que recordem que era si "¿Hay alguna edad con mayor incidencia de síntomas vocales?". Per a això, anam a fer en primer lloc, un broxplot:
+
+```{r}
+grafic4 <- dades %>% select(edat, VHI) %>% ggplot(aes(x = edat, y = VHI)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+grafic4
+```
+Interpretarem aquest gràfic pels grups d'edats: 
+
+- Entre 20 y 35:
+El àrea de la caixa ens mostra que 
+El rang interquartílic (l'àrea entre la caixa) mostra que la majoria de les puntuacions estan entre aproximadament 5 i 12.
+La mitjana està prop de 10, cosa que indica que el 50% de les persones en aquest grup tenen puntuacions menors a 10.
+
+- Entre 36 y 50:
+
+El rang interquartílic és similar al grup anterior, té una mitjana al voltant de 10. En canvi, hi ha alguns outliers (punts negres), la qual cosa ens indica que algunes persones en aquest grup tenen puntuacions molt més altes que les altres.
+
+- Entre 51 i 65:
+
+Aquest grup té una distribució semblant als dos primers, amb una mitjana al voltant de 10 i una dispersió més baixa que el grup de 36-50. Això suggereix que els problemes vocals són menys variables en aquest grup.
+
+
+- Més de 65:
+
+Açí, la dispersió és mínima, per tant, ens indica que tots tenen puntuacions similars (prop de 10). No s'hi observen outliers, i sembla que hi ha poca variabilitat en els problemes vocals d'aquest grup. Tampoc tenim molta informació sobre aquesta edat, ja que, com em vist al primer gràfic, aquesta edat tenia molts poc enquestats.
+
+Per tant, com a conclusió final, vagem que 
+
+Els grups d'edats més joves i de mitjana edat semblen tenir més variabilitat en els problemes vocals, mentre que els més grans de 65 anys mostren menys variació.
+Els outliers al grup de 36 a 50 podrien suggerir que alguns individus tenen problemes vocals significativament més grans en comparació amb la resta de les edats.
+
+Finalment, farem un violin plot, anem a veure que ens diu:
+
+```{r}
+grafic5 <- dades %>%  select(edat, VHI) %>% ggplot(aes(x = edat, y = VHI)) + geom_violin(trim = F, fill = "pink", color = "red") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+grafic5
+```
+Els grups més joves (20-35 i 36-50) tenen més variabilitat en els problemes vocals, amb puntuacions que es dispersen més al llarg del rang.
+A mesura que augmenta l'edat (51-65 i més de 65), sembla que les puntuacions són més homogènies, amb menys dispersió i una concentració més forta al voltant d'una puntuació central (prop de 10).
+El grup de més de 65 anys és el que té la distribució més concentrada i homogènia, cosa que pot suggerir que els problemes vocals en aquest grup són més consistents entre els individus.
+
+Observem que ens dos ùltims gràfics ens donen la mateixa informació. Per tant, es podria concloure que els grups més joves tenen una major incidència i variabilitat de símptomes vocals en comparació dels grups de més edat, on la severitat dels símptomes sembla més uniforme.
+
+Per acabar l'informe, anam a fer una prova de test inferencial:
+```{r}
+taula <- table(dades$edat,dades$simptomes)
+chisq.test(taula)
+```
+Un *p-valor* tan gran no ens permet rebutjar la hipòtesi nul·la de que les variables edat i símptomes siguin independents.
+
+
+
+
+Anem a separar les variables de la variable sintomes.aquest més:
+
+```{r}
+dades$simptomes <- dades$simptomes %>% as.character()
+
+simptomes_separat <- dades %>% separate_rows(simptomes, sep = ",\\s*")
+
+contar_simptomes <- simptomes_separat %>% group_by(edat, simptomes) %>%
+  summarise(Conteo = n()) %>%
+  ungroup()
+```
+
+```{r}
+
+contar_simptomes %>% ggplot(aes(x = edat, y = Conteo, fill = simptomes)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Aparició de símptomes per edat", x = "Edat", y = "Freqüència absoluta") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+grafic2 <- dades %>% select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+grafic2
+```
+
+```{r}
+grafic3 <- dades %>%  select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_violin(trim = F, fill = "pink", color = "red") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+grafic3
+```
+
+
+
+
+"JAUME - HO DEIXE PERSIDECAS 
+```{r}
 
 dades <- raw_data %>% rename(
   edat = Quina.edat.té.,
@@ -98,52 +351,4 @@ dades <- dades %>%
 dades$edat <- dades$edat %>% factor(levels = c("Entre 20 i 35", "Entre 36 i 50", "Entre 51 i 65", "+ de 65"))
 
 ```
-
-# Objectius del projecte
-
-L'objectiu principal d'aquesta enquesta és analitzar si la formació en veu que té l'enquestat influeix en la percepció de qualitat de la mateixa. En concret al nostre grup ens ha tocat treballar sobre la relació entre la veu i l'edat; intentarem respondre a la pregunta: ¿Hi ha qualque edat amb més incidències de símptomes vocals? D'aquesta manera intentarem arribar a una conclusió que ens permeti valorar si la veu es deteriora amb l'edat, o pel contrari no existeix una relació important entre ambdoós factors.
-
-Emprarem en primer lloc les dades de la variable *edat* que ens ve donada en forma de dades ordinals. Farem un gràfic per visualitzar com es distribueixen els enquestats a les diferents categories. (Entre 20 i 35, Entre 36 i 50, Entre 51 i 65, + de 65).
-
-També utilitzarem els resultats del test que s'ha inclòs al final de l'enquesta que ens venen donats com dades quantitatives discretes que es sitúen entre 0 i 40; on més puntuació implica que l'enquestat té una pitjor salut de la veu. Per obtenir aquestes dades substituirem les possibles respostes de cada pregunta per dades numèriques entre 1 i 4. Finalment sumarem tots els valors agrupant les dades a una columna que ens doni la puntuació final.
-
-Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relació que cercam o no.
-
-# Anàlisis de les dades
-
-```{r}
-grafic <- dades %>% ggplot(aes(x = edat)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
-grafic
-```
-
-Anem a separar les variables de la variable sintomes.aquest més:
-
-```{r}
-dades$simptomes <- dades$simptomes %>% as.character()
-
-simptomes_separat <- dades %>% separate_rows(simptomes, sep = ",\\s*")
-
-contar_simptomes <- simptomes_separat %>% group_by(edat, simptomes) %>%
-  summarise(Conteo = n()) %>%
-  ungroup()
-```
-
-```{r}
-
-contar_simptomes %>% ggplot(aes(x = edat, y = Conteo, fill = simptomes)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Aparició de símptomes per edat", x = "Edat", y = "Freqüència absoluta") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-```{r}
-grafic2 <- dades %>% select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
-grafic2
-```
-
-```{r}
-grafic3 <- dades %>%  select(edat, SumaFila) %>% ggplot(aes(x = edat, y = SumaFila)) + geom_violin(trim = F, fill = "pink", color = "red") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
-grafic3
-```
-hola
+"
