@@ -97,7 +97,7 @@ contar_simptomes <- simptomes_separat %>% group_by(edat, simptomes) %>%
   summarise(Conteo = n()) %>%
   ungroup()
 contar_simptomes <- contar_simptomes %>% filter(simptomes != "escanyada")
-
+contar_simptomes$simptomes <- contar_simptomes$simptomes %>% factor(levels=c("Fatiga vocal","Mucositat","Necessitat d' aclarir la veu de manera persistent","Veu ronca"),labels=c("Fatiga vocal","Mucositat","Aclarir la veu","Veu ronca"))
 ```  
 
 Ara, per a calcular l'índex de qualitat de veu (VHI), anem a seleccionar les variables començant per la 28 fins a la 37 per a convertir-les en qualitatives discretes i sumar-les.
@@ -146,8 +146,7 @@ Per tant, tenim més enquestats d' entre 36 i 50 anys , i pràcticament cap de +
 En segon lloc, farem un gràfic per veurer quin és el simptoma més freqüent entre els enquestats, on fàcilment veiem que són la mucositat i la necessitat d'aclarir la veu de manera persistent.
 
 ```{r}
-contar_simptomes$simptomes <- factor(contar_simptomes$simptomes, levels = c("Fatiga vocal"="Fatiga vocal", "Mucositat"="Mucositat","Necessitat d'aclarir la veu de manera persistent"="Aclarir la veu","Veu ronca"="Veu ronca"), labels = c("Fatiga vocal", "Mucositat","Aclarir la veu","Veu ronca"))
-grafic2 <- contar_simptomes %>% ggplot(aes(x=simptomes)) + geom_bar(color = "blue", fill = "blue") + labs(x="Simptomes", y="Freqüència absoluta") + ggtitle("Distribució per simptomes") + theme_minimal() 
+grafic2 <- contar_simptomes %>% ggplot(aes(x=simptomes)) + geom_bar(color = "blue", fill = "blue") + labs(x="Simptomes", y="Freqüència absoluta") + ggtitle("Distribució per símptomes") + theme_minimal() 
 grafic2
 ```
 
@@ -198,14 +197,19 @@ El grup de més de 65 anys és el que té la distribució més concentrada i hom
 
 Observem que els dos ùltims gràfics ens donen la mateixa informació. Per tant, es podria concloure que els grups més joves tenen una major incidència i variabilitat de símptomes vocals en comparació dels grups de més edat, on la severitat dels símptomes sembla més uniforme.
 
-Per acabar l'informe, anam a fer una prova de test inferencial:
+Per acabar l'informe, anam a fer una prova de test inferencial. Aplicarem el test qui-quadrat per comprovar si l'edat i els símptomes són variables independents:
 ```{r}
 dades_2 <- dades %>% subset(select = c(edat,simptomes))
 chisq.test(dades_2$edat,dades_2$simptomes)
 ```
-Un *p-valor* tan gran no ens permet rebutjar la hipòtesi nul·la de que les variables edat i símptomes siguin independents. No obstant, aquesta prova inferencial pot ser incorrecta pel escàs nombre de mostres.
+El test ens està avisant de que la freqüència esperada de qualque nivell és inferior a 5, i per tant, no es pot assegurar que el resultat que ens dona el test sigui correcte. Per solucionar aquest problema, podem estimar el *p-valor* fent simulacions amb el mètode de Montecarlo.
 
+```{r}
+set.seed(2024)
+chisq.test(dades_2$edat, dades_2$simptomes, simulate.p.value=TRUE, B=5000)
+```
 
+Un *p-valor* tan gran no ens permet rebutjar la hipòtesi nul·la de que les variables edat i símptomes siguin independents.
 
 
 
