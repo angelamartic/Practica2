@@ -74,8 +74,6 @@ raw_data <- raw_data %>% rename(
     Minusvalia="La.meva.veu.em.fa.sentir.certa.minusvalidesa",
     Gent_pregunta="La.gent.em.pregunta..què.et.passa.amb.la.veu."
 )
-
-#glimpse(raw_data)
 ```
 
 Anem a netejar les variables i a convertir les categòriques en factors, a excepció de "Importancia_veu" i "dieta_saludable", que les deixarem com a qualitatives discretes. 
@@ -210,6 +208,11 @@ chisq.test(dades_2$edat, dades_2$simptomes, simulate.p.value=TRUE, B=5000)
 ```
 
 Un *p-valor* tan gran no ens permet rebutjar la hipòtesi nul·la de que les variables edat i símptomes siguin independents.
+
+Per tant, no hi ha evidència clara per afirmar que existeix o no una relació entre l'edat dels enquestats i els símptomes que afirmen haver mostrat durant el darrer mes.
+
+
+
 
 
 
