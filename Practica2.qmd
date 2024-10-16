@@ -121,6 +121,7 @@ dades<-dades %>% select(-c(28:37))%>%
    bind_cols(VHI=dades_1$VHI)
 ```
 
+
 # Objectius del projecte
 
 L'objectiu principal d'aquesta enquesta és analitzar si la formació en veu que té l'enquestat influeix en la percepció de qualitat de la mateixa. En concret al nostre grup ens ha tocat treballar sobre la relació entre la veu, l'edat i els símptomes vocals; intentarem respondre a la pregunta: ¿Hi ha qualque edat amb més incidències de símptomes vocals? D'aquesta manera intentarem arribar a una conclusió que ens permeti valorar si la veu es deteriora amb l'edat, o pel contrari no existeix una relació important entre ambdós factors.
@@ -156,8 +157,11 @@ Veiem que a totes les edats predomina la mucositat, seguit de la resta de símpt
 Per poder treure una conclusió més clara a la pregunta que ens demanen, que recordem que era si "¿Hay alguna edad con mayor incidencia de síntomas vocales?" anem a fer en primer lloc, un boxplot, per visualitzar millor com es distribueix la puntuació:
 
 ```{r, echo=FALSE}
-grafic4 <- dades %>% select(edat, VHI) %>% ggplot(aes(x = edat, y = VHI)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
+conteo <- table(dades$edat)
+conteo
+grafic4 <- dades %>% select(edat, VHI) %>% ggplot(aes(x = edat, y = VHI, label = edat)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic4
+
 ```
 Interpretarem aquest gràfic pels grups d'edats: 
 
