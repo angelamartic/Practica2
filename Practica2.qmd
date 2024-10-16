@@ -209,7 +209,7 @@ chisq.test(dades_2$edat, dades_2$simptomes, simulate.p.value=TRUE, B=5000)
 
 Un *p-valor* tan gran no ens permet rebutjar la hipòtesi nul·la de que les variables edat i símptomes siguin independents.
 
-Per tant, no hi ha evidència clara per afirmar que existeix o no una relació entre l'edat dels enquestats i els símptomes que afirmen haver mostrat durant el darrer mes.
+Per tant, no hi ha evidència clara per afirmar que existeix una relació entre l'edat dels enquestats i els símptomes que afirmen haver mostrat durant el darrer mes.
 
 
 
