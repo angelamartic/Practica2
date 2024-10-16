@@ -141,13 +141,6 @@ grafic1
 ```
 Per tant, tenim més enquestats d' entre 36 i 50 anys , i pràcticament cap de +65 anys. Això pot afectara l'anàlisi, ja que les dades no es troben uniformement distribuïdes entre les quatre categoríes. 
 
-En segon lloc, farem un gràfic per veurer quin és el simptoma més freqüent entre els enquestats, on fàcilment veiem que són la mucositat i la necessitat d'aclarir la veu de manera persistent.
-
-```{r}
-grafic2 <- contar_simptomes %>% ggplot(aes(x=simptomes)) + geom_bar(color = "blue", fill = "blue") + labs(x="Simptomes", y="Freqüència absoluta") + ggtitle("Distribució per símptomes") + theme_minimal() 
-grafic2
-```
-
 Ara, per respondre aquesta pregunta, representarem un diagrama de barres agrupat entre l'edat i els simptomes:
 
 ```{r}
