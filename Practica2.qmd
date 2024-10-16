@@ -135,7 +135,7 @@ Per acabar creuarem l'edat amb la puntuació per concloure si existeix la relaci
 
 Com hem indicat, en primer lloc, farem un gràfic, per veure com es distribueixen els enquestats a les diferents categories d'edat.
 
-```{r}
+```{r, echo=FALSE}
 grafic1 <- dades %>% ggplot(aes(x = edat)) + geom_bar(color = "blue", fill = "blue") + labs(x="Edats", y="Freqüència absoluta") + ggtitle("Distribució per edats") + theme_minimal()
 grafic1
 ```
@@ -143,7 +143,7 @@ Per tant, tenim més enquestats d' entre 36 i 50 anys , i pràcticament cap de +
 
 Ara, per respondre aquesta pregunta, representarem un diagrama de barres agrupat entre l'edat i els simptomes:
 
-```{r}
+```{r, echo=FALSE}
 grafic3 <- contar_simptomes %>% ggplot(aes(x = edat, y = Conteo, fill = simptomes)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Aparició de símptomes per edat", x = "Edat", y = "Freqüència absoluta") +
@@ -155,7 +155,7 @@ Veiem que a totes les edats predomina la mucositat, seguit de la resta de símpt
 
 Per poder treure una conclusió més clara a la pregunta que ens demanen, que recordem que era si "¿Hay alguna edad con mayor incidencia de síntomas vocales?" anem a fer en primer lloc, un boxplot, per visualitzar millor com es distribueix la puntuació:
 
-```{r}
+```{r, echo=FALSE}
 grafic4 <- dades %>% select(edat, VHI) %>% ggplot(aes(x = edat, y = VHI)) + geom_boxplot( color = "black") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic4
 ```
@@ -179,7 +179,7 @@ D'aquest grup no podem dir res ja que pràcticament no hi ha dades. Només podem
 
 Finalment, farem un diagrama de violí:
 
-```{r}
+```{r, echo=FALSE}
 grafic5 <- dades %>%  select(edat, VHI) %>% ggplot(aes(x = edat, y = VHI)) + geom_violin(trim = F, fill = "pink", color = "red") + labs(x = "Edat", y = "Puntuació") + ggtitle("Puntuació per edats") + theme_minimal()
 grafic5 
 ```
@@ -189,13 +189,13 @@ El grup de més de 65 anys és el que té la distribució més concentrada i hom
 Observem que els dos ùltims gràfics ens donen la mateixa informació. Per tant, es podria concloure que els grups més joves tenen una major incidència i variabilitat de símptomes vocals en comparació dels grups de més edat, on la severitat dels símptomes sembla més uniforme.
 
 Per acabar l'informe, anam a fer una prova de test inferencial. Aplicarem el test qui-quadrat per comprovar si l'edat i els símptomes són variables independents:
-```{r}
+```{r, echo=FALSE}
 dades_2 <- dades %>% subset(select = c(edat,simptomes))
 chisq.test(dades_2$edat,dades_2$simptomes)
 ```
 El test ens està avisant de que la freqüència esperada de qualque nivell és inferior a 5, i per tant, no es pot assegurar que el resultat que ens dona el test sigui correcte. Per solucionar aquest problema, podem estimar el *p-valor* fent simulacions amb el mètode de Montecarlo.
 
-```{r}
+```{r, echo=FALSE}
 set.seed(2024)
 chisq.test(dades_2$edat, dades_2$simptomes, simulate.p.value=TRUE, B=5000)
 ```
