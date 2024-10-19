@@ -1,0 +1,17 @@
+```{r}
+contar_edat <- dades %>%
+  group_by(edat) %>%
+  summarise(n = n())
+
+grafic4 <- dades %>%
+  select(edat, VHI) %>%
+  ggplot(aes(x = edat, y = VHI)) +
+  geom_boxplot(color = "black") +
+  labs(x = "Edat", y = "Puntuació") +
+  ggtitle("Puntuació per edats") +
+  theme_minimal() +
+  geom_text(data = conteo, aes(x = edat, y = max(dades$VHI) + 1, label = n), 
+            color = "red", size = 3)
+
+grafic4
+```
